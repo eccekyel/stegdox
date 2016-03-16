@@ -1,0 +1,24 @@
+###############
+# DESCRIPCION #
+###############
+En este archivo se guardarán los identificadores a las bases de datos
+de los objetivos. Este archivo se usa para guardarlo encriptado en la
+imagen description.jpg que debería encontrarse en casa directorio que
+se use como almacenadora de una base de datos de stegdox.
+
+#############
+#  FORMATO  #
+#############
+
+Las identificaciones irán escritas línea por línea en un archivo como
+este a partir de la LINEA NUMERO 20
+
+El formato de cada identificacion será [indexNumber,nombreObjetivo,pathPortador]
+La primera identificacion se usa como ejemplo y tiene un indexNumber = 0
+
+[0,NotaName,~]
+
+
+
+
+
