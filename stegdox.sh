@@ -5,10 +5,11 @@
 DB_PATH=""
 
 # Ruta de almacenamiento de datos temporales
-DUMP_PATH="/tmp/st3gd0x"
+TMP_PATH="/tmp/st3gd0x"
 
 # Ruta del script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo -e $DIR
 
 # Colores
 blanco="\033[1;37m"
@@ -86,7 +87,7 @@ function askPath {
 		if [ ! -d $dir_path ]; then
 			echo -e $rojo "Este directorio no existe, por favor ingrese alguno válido"
 		else
-			DB_PATH=dir_path
+			DB_PATH=$dir_path
 			break 
 		fi
 	echo -e $DB_PATH
@@ -96,7 +97,7 @@ function askPath {
 # Desencriptar y mostrar listado de objetivos en la base de datos con sus respectivos
 # archivos asociados 
 function disList { 
-	if [ ! -d  $DB_PATH/description.jpg ]; then
+	if [ ! -d  $DB_PATH"/"description.jpg ]; then
 		echo -e "En este directorio no existe el archivo description.jpg,"
 		echo -e "¿qué desea hacer al respecto?"
 		echo -e $rojo "Operación a realizar:"
@@ -107,12 +108,14 @@ function disList {
 		echo -n "      #> "
 		read choice
 		case $choice in
-			1 ) cp -i $DIR/description.jpg $DB_PATH ;;
+			1 ) cp -i $DIR"/"description.jpg $DB_PATH"/"description.jpg;
+				steghide embed -cf $DB_PATH"/"description.jpg -ef texto.txt;
+				echo "";;
 			2 ) echo -e "" ;;
 			* ) echo -e "opción desconocida, elige de nuevo" ;;
 		esac
 	else
-		echo -e ""
+		steghide --extract -sf $DB_PATH"/"description.jpg
 	fi
 }
 ###############################################################################
@@ -120,8 +123,8 @@ function disList {
 ###############################################################################
 
 # Crea directorio temporal
-if [ ! -d $DUMP_PATH ]; then
-	mkdir $DUMP_PATH
+if [ ! -d $TMP_PATH ]; then
+	mkdir $TMP_PATH
 fi
 
 requirements
@@ -130,4 +133,4 @@ askTask
 read # eliminar esto
 
 # Elimina el directorio temporal y todo su contenido
-rm -R $DUMP_PATH
+rm -R $TMP_PATH
