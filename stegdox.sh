@@ -7,6 +7,9 @@ DB_PATH=""
 # Ruta de almacenamiento de datos temporales
 DUMP_PATH="/tmp/st3gd0x"
 
+# Ruta del script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Colores
 blanco="\033[1;37m"
 gris="\033[0;37m"
@@ -47,7 +50,7 @@ function askTask {
 function consultar {
 	# Imprimir todos los objetivos de la base de datos indexados, de manera
 	# que se elija un numero y disponga la información en pantalla
-	
+	disList
 	echo -e ""
 }
 
@@ -90,6 +93,28 @@ function askPath {
 	done
 }
 
+# Desencriptar y mostrar listado de objetivos en la base de datos con sus respectivos
+# archivos asociados 
+function disList { 
+	if [ ! -d  $DB_PATH/description.jpg ]; then
+		echo -e "En este directorio no existe el archivo description.jpg,"
+		echo -e "¿qué desea hacer al respecto?"
+		echo -e $rojo "Operación a realizar:"
+		echo -e $verde "	1) Crear el archivo en este directorio"
+		echo -e $verde "	2) Elegir otro directorio"
+		echo -e $rescolor ""
+		echo "                                       "
+		echo -n "      #> "
+		read choice
+		case $choice in
+			1 ) cp -i $DIR/description.jpg $DB_PATH ;;
+			2 ) echo -e "" ;;
+			* ) echo -e "opción desconocida, elige de nuevo" ;;
+		esac
+	else
+		echo -e ""
+	fi
+}
 ###############################################################################
 ######                                MAIN                              #######
 ###############################################################################
