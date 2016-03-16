@@ -39,8 +39,8 @@ function askTask {
 		echo -n "      #> "
 		read choice
 		case $choice in
-			1 ) echo -e "has elegido 1"; consultar; break ;;
-			2 ) echo -e "has elegido 2"; modificar; break ;;
+			1 ) consultar; break ;;
+			2 ) modificar; break ;;
 			* ) echo -e "opción desconocida, elige de nuevo" ;;
 		esac	
 	done
@@ -97,7 +97,8 @@ function askPath {
 # Desencriptar y mostrar listado de objetivos en la base de datos con sus respectivos
 # archivos asociados 
 function disList { 
-	if [ ! -d  $DB_PATH"/"description.jpg ]; then
+	DESCRIPTION=$DB_PATH"/""description.jpg"
+	if [ ! -f $DESCRIPTION ]; then
 		echo -e "En este directorio no existe el archivo description.jpg,"
 		echo -e "¿qué desea hacer al respecto?"
 		echo -e $rojo "Operación a realizar:"
@@ -108,14 +109,17 @@ function disList {
 		echo -n "      #> "
 		read choice
 		case $choice in
-			1 ) cp -i $DIR"/"description.jpg $DB_PATH"/"description.jpg;
-				steghide embed -cf $DB_PATH"/"description.jpg -ef texto.txt;
+			1 ) cp -i $DIR"/""description.jpg" $DB_PATH"/""description.jpg";
+				steghide embed -cf $DESCRIPTION -ef $DIR"/""desHeader.txt";
 				echo "";;
 			2 ) echo -e "" ;;
 			* ) echo -e "opción desconocida, elige de nuevo" ;;
 		esac
 	else
-		steghide --extract -sf $DB_PATH"/"description.jpg
+		cd $TMP_PATH
+		steghide --extract -sf $DB_PATH"/""description.jpg"
+		# 
+		cd $DIR
 	fi
 }
 ###############################################################################
