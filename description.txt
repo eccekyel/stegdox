@@ -11,12 +11,12 @@ se use como almacenadora de una base de datos de stegdox.
 #############
 
 Las identificaciones irán escritas línea por línea en un archivo como
-este a partir de la LINEA NUMERO 20
+este a partir de la LINEA NUMERO 219
 
-El formato de cada identificacion será [indexNumber,nombreObjetivo,pathPortador]
-La primera identificacion se usa como ejemplo y tiene un indexNumber = 0
+El formato de cada identificacion será nombreObjetivo ---> IDportador
+La primera identificacion se usa como ejemplo en la línea 19.
 
-[0,NotaName,~]
+Nombre ---> ID.jpg
 
 
 
