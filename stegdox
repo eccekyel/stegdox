@@ -7,7 +7,7 @@ DB_PATH=""
 # Ruta de almacenamiento de datos temporales
 TMP_PATH="/tmp/st3gd0x"
 
-# Ruta del script
+# Ruta del script, donde deben ir ademas los archivos description.jpg description.txt y ficha.txt
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo -e $DIR
 
@@ -27,41 +27,119 @@ rescolor="\e[0m"
 ######                             FUNCIONES                            #######
 ###############################################################################
 
-#Pregunta si consultar o modificar
-function askTask {
-
-	while true; do
-		echo -e $rojo "Operación a realizar:"
-		echo -e $verde "	1) Consultar Base de Datos"
-		echo -e $verde "	2) Modificar Base de Datos"
-		echo -e $rescolor ""
-		echo "                                       "
-		echo -n "      #> "
-		read choice
-		case $choice in
-			1 ) consultar; break ;;
-			2 ) modificar; break ;;
-			* ) echo -e "opción desconocida, elige de nuevo" ;;
-		esac	
-	done
-
-}
-
 # Consultar Base de Datos
-function consultar {
-	# Imprimir todos los objetivos de la base de datos indexados, de manera
-	# que se elija un numero y disponga la información en pantalla
-	disList
-	echo -e ""
-}
 
 # Modificar Base de Datos
 function modificar {
-	# Preguntar qué es lo que se desea modificar
-	# Posibles acciones:
-		# Crear nueva entidad
-		# Modificar campo de identidad
+	echo -e "¿Qué acción desea realizar?"
+	echo -e $rojo "Operación a realizar:"
+	echo -e $verde "	1) Crear nuevo objetivo"
+	echo -e $verde "	2) Modificar información de algún objetivo"	
+	echo -e $rescolor ""
+	echo "                                       "
+	echo -n "      #> "
+	read choice
+	case $choice in
+		1 ) newEntity;;
+		2 ) modEntity;;
+		* ) echo -e "opción desconocida, elige de nuevo" ;;
+	esac
 	echo -e ""
+}
+
+function newEntity {
+	echo -e $rojo"Para crear un nuevo objetivo debes tener algun archivo jpg, bmp, wav o au"
+	echo -e $rojo"en el directorio que has elegido y que no has utilizado para otro objetivo"
+	echo -e $rojo"\nCuando tengas el archivo en el directorio escribe aquí el nombre del archivo"
+	echo -e $rojo"junto a su extensión, por ejemplo: ejemplo.jpg"$rescolor
+	echo "                                       "
+	echo -n "      #> "
+	read portador
+	if [ ! -f $DB_PATH"/"$portador ]; then
+		echo -e $rojo"ADVERTENCIA! EL ARCHIVO PORTADOR QUE HAS INDICADO NO EXISTE"
+		echo -e "ESCRIIBE  UN PORTADOR PERMITIDO  O REVISA SI LO HAS PUESTO EN EL"
+		echo -e "DIRECTORIO QUE ESCOGISTE COMO BASE DE DATOS"$rescolor
+		newEntity
+	else
+		echo -e $azul"Grabando ficha vacía en el archivo"$rescolor
+		echo -e $azul"\nEscribe una contraseña para luego desencriptar"$rescolor
+		steghide embed -cf $DB_PATH"/"$portador -ef $DIR"/""ficha.txt"
+		
+		#Agregar indice al archivo description
+		cd $TMP_PATH
+		echo -e $azul"Escriba su contraseña del description"
+		echo -e $rescolor""
+		steghide --extract -sf $DB_PATH"/""description.jpg"
+		echo -e " "
+		echo -e $rojo "Nombre ID del objetivo"$rescolor
+		echo "                                       "
+		echo -n "      #> "
+		echo $azul"	espere un momento"		
+		sleep 3
+		read nombreObjetivo
+		echo -e $azul"Creando índice para el nuevo objetivo"$rescolor
+		echo $nombreObjetivo" ---> "$portador >> $TMP_PATH"/""description.txt"
+		echo -e $azul"Sobrescriba su contraseña del description"$recolor
+		steghide embed -cf $DB_PATH"/""description.jpg" -ef $TMP_PATH"/""description.txt"
+		echo -e $azul"Listando objetivos en el directorio escogido"
+		echo -e $rescolor""
+		listar
+		rm description.txt
+		cd $DIR
+	fi
+}
+
+function modEntity {
+	entityInfo
+	echo -e $rojo "Número del campo que desea modificar:"$rescolor
+	echo "                                       "
+	echo -n "      #> "
+	read campox
+	case $campox in:
+		1 ) ;;
+		2 ) ;;
+		3 ) ;;
+		4 ) ;;
+		5 ) ;;
+		6 ) ;;
+		7 ) ;;
+		8 ) ;;
+		9 ) ;;
+		10 ) ;;
+		11 ) ;;
+		12 ) ;;
+		13 ) ;;
+		14 ) ;;
+		15 ) ;;
+		16 ) ;;
+		17 ) ;;
+		18 ) ;;
+		19 ) ;;
+		
+		* ) echo "Opción desconocida, por favor ingresa alguna válida"; modEntity;;
+	esac
+}
+
+function entityInfo {
+	echo -e $rojo"Escriba el ID del archivo a modificar"$rescolor
+	echo "                                       "
+	echo -n "      #> "
+	read portadorx
+	cd $TMP_PATH
+	echo  -e $azul"Escriba la contraseña del archivo"
+	echo  -e $rescolor""
+	steghide --extract -sf $DB_PATH"/"$portadorx
+	echo  -e " "
+	echo  -e $azul"Datos extraídos exitosamente"
+	echo  -e "Listando campos del objetivo"
+	echo  -e $rescolor""
+	i=0
+	while read line ; do
+		i=$(($i+1));
+   		echo -e $verde$i")" $amarillo$line
+	done < $TMP_PATH/ficha.txt
+	echo -e $rescolor
+	cd $DIR
 }
 
 function requirements {
@@ -69,7 +147,7 @@ function requirements {
 	echo -ne "Steghide..........."
 	if [ ! hash steghide 2>/dev/null ]; then
 		echo -e "\e[1;31mNo se encuentra instalado"$rescolor" (prueba con sudo apt-get install steghide)"
-		salir=1
+		exit
 	else
 		echo -e "\e[1;32mOK!"$rescolor""
 	fi
@@ -110,18 +188,43 @@ function disList {
 		read choice
 		case $choice in
 			1 ) cp -i $DIR"/""description.jpg" $DB_PATH"/""description.jpg";
-				steghide embed -cf $DESCRIPTION -ef $DIR"/""desHeader.txt";
-				echo "";;
-			2 ) echo -e "" ;;
-			* ) echo -e "opción desconocida, elige de nuevo" ;;
+				echo  -e $azul"Creando archivo description.jpg ...";
+				echo  -e $azul"Por favor escribe una password ...";
+				echo  -e $rescolor"";
+				steghide embed -cf $DESCRIPTION -ef $DIR"/""description.txt";
+				echo  " ";
+				disList;; #Esto lo hace saltar al else
+			2 ) askPath; askTask;;
+			* ) echo  "opción desconocida, elige de nuevo"; disList;;
 		esac
 	else
 		cd $TMP_PATH
+		echo -e $azul"Escriba su contraseña para extraer los datos"
+		echo -e $rescolor""
 		steghide --extract -sf $DB_PATH"/""description.jpg"
-		# 
+		echo " "
+		echo -e $azul"Datos extraídos exitosamente"
+		echo "Listando objetivos en el directorio escogido"
+		echo -e $rescolor""
+		listar
 		cd $DIR
 	fi
 }
+
+function listar {
+	i=0
+	echo -e $amarillo"   Nombre" $blanco" --->" $amarillo" ID"
+	while read line ; do 
+		i=$(($i+1));
+		if [ $i -lt 19 ]; then
+			continue
+		else
+   			echo -e $verde$((i-19))")" $rojo$line
+		fi
+	done < $TMP_PATH/description.txt
+	echo -e $rescolor""
+}
+
 ###############################################################################
 ######                                MAIN                              #######
 ###############################################################################
@@ -131,9 +234,12 @@ if [ ! -d $TMP_PATH ]; then
 	mkdir $TMP_PATH
 fi
 
+echo -e ""
 requirements
+echo -e ""
 askPath
-askTask
+disList
+modificar
 read # eliminar esto
 
 # Elimina el directorio temporal y todo su contenido
